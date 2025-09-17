@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.config.database import get_db
-from app.controllers.article_controller import (
+from app.articles.controller import (
     create_article, 
     get_articles, 
     get_article, 
     update_article, 
     delete_article
 )
-from app.schemas.article import ArticleCreate, ArticleResponse
+from app.articles.schema import ArticleCreate, ArticleResponse
 from typing import List
 
 router = APIRouter(prefix="/articles", tags=["Articles"])

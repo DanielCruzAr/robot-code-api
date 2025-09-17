@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.article import Article
-from app.schemas.article import ArticleCreate
+from app.articles.schema import ArticleCreate, ArticleResponse
+from app.services import cache_service
 
 
-def create_article(db: Session, article: ArticleCreate) -> Article:
+async def create_article(db: Session, article: ArticleCreate) -> ArticleResponse:
     db_article = db.query(Article).filter(
         (Article.title == article.title) | (Article.author == article.author)
     ).first()
@@ -16,6 +17,9 @@ def create_article(db: Session, article: ArticleCreate) -> Article:
         )
     
     new_article = Article(**article.model_dump())
+    cache_res = cache_service.set_cache("article", new_article.id, new_article)
+    if cache_res.get("message"):
+        print("Cache set:", cache_res["message"])
     db.add(new_article)
     db.commit()
     db.refresh(new_article)
@@ -26,7 +30,11 @@ def get_articles(db: Session) -> list[Article]:
     return db.query(Article).all()
 
 
-def get_article(db: Session, article_id: int) -> Article:
+async def get_article(db: Session, article_id: int) -> ArticleResponse:
+    cache_result = await cache_service.get_cache("article", article_id)
+    if cache_result.get("success"):
+        return cache_result["value"]
+    
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(
@@ -35,7 +43,7 @@ def get_article(db: Session, article_id: int) -> Article:
         )
     return article
 
-def update_article(db: Session, article_id: int, article_data: ArticleCreate) -> Article:
+def update_article(db: Session, article_id: int, article_data: ArticleCreate) -> ArticleResponse:
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
         raise HTTPException(
