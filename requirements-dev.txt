@@ -1,5 +1,3 @@
-# Migrations
-alembic
-
-# Dev tools
-python-dotenv
+pytest
+pytest-asyncio
+httpx
