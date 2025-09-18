@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from app.articles import view
+from .logging import configure_logging, LogLevels
 import logging
 
+
+configure_logging(LogLevels.info)
 
 app = FastAPI(title="Article Management API", version="1.0.0")
 

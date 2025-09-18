@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.articles.controller import (
@@ -20,7 +20,7 @@ from app.articles.schema import (
 router = APIRouter(prefix="/articles", tags=["Articles"])
 
 
-@router.post("/", response_model=ArticleResponse)
+@router.post("/", response_model=ArticleResponse, status_code=status.HTTP_201_CREATED)
 async def create_article_view(article: ArticleCreate, db: Session = Depends(get_db)):
     return await create_article(db, article)
 
