@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.articles.controller import (
@@ -8,19 +9,36 @@ from app.articles.controller import (
     update_article, 
     delete_article
 )
-from app.articles.schema import ArticleCreate, ArticleResponse
-from typing import List
+from app.articles.schema import ArticleCreate, ArticleResponse, PaginatedArticles
+
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
+
 
 @router.post("/", response_model=ArticleResponse)
 async def create_article_view(article: ArticleCreate, db: Session = Depends(get_db)):
     return await create_article(db, article)
 
 
-@router.get("/", response_model=List[ArticleResponse])
-def get_articles_view(db: Session = Depends(get_db)):
-    return get_articles(db)
+@router.get("/", response_model=PaginatedArticles)
+def get_articles_view(
+    db: Session = Depends(get_db), 
+    page: int = 1, 
+    page_size: int = 10,
+    title: Optional[str] = None,
+    author: Optional[str] = None,
+    tags: Optional[List[str]] = Query(None),
+    content: Optional[str] = None
+):
+    return get_articles(
+        db, 
+        page=page, 
+        page_size=page_size, 
+        title=title, 
+        author=author, 
+        tags=tags, 
+        content=content
+    )
 
 
 @router.get("/{article_id}", response_model=ArticleResponse)
