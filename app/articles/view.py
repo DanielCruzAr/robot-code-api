@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Request
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.articles.controller import (
@@ -16,22 +16,27 @@ from app.articles.schema import (
     ArticleUpdate
 )
 from app.utils.auth_utils import get_api_key
+from ..rate_limiting import limiter
 
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
 
 
 @router.post("/", response_model=ArticleResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute") 
 async def create_article_view(
+    request: Request,
     article: ArticleCreate, 
     db: Session = Depends(get_db),
-    api_key: str = Depends(get_api_key)
+    api_key: str = Depends(get_api_key),
 ):
     return await create_article(db, article)
 
 
 @router.get("/", response_model=PaginatedArticles)
+@limiter.limit("20/minute")
 def get_articles_view(
+    request: Request,
     db: Session = Depends(get_db), 
     page: int = 1, 
     page_size: int = 10,
@@ -53,7 +58,9 @@ def get_articles_view(
 
 
 @router.get("/{article_id}", response_model=ArticleResponse)
+@limiter.limit("20/minute")
 async def get_article_view(
+    request: Request,
     article_id: int, 
     db: Session = Depends(get_db),
     api_key: str = Depends(get_api_key)
@@ -62,7 +69,9 @@ async def get_article_view(
 
 
 @router.put("/{article_id}", response_model=ArticleResponse)
+@limiter.limit("10/minute")
 async def update_article_view(
+    request: Request,
     article_id: int, 
     article: ArticleUpdate, 
     db: Session = Depends(get_db),
@@ -72,7 +81,9 @@ async def update_article_view(
 
 
 @router.delete("/{article_id}", status_code=204)
+@limiter.limit("10/minute")
 async def delete_article_view(
+    request: Request,
     article_id: int, 
     db: Session = Depends(get_db),
     api_key: str = Depends(get_api_key)
