@@ -22,7 +22,8 @@ services:
       retries: 5
       
   web:
-    build: .
+    image: cruzard/rocket-code-api-web:latest
+    #build: .
     ports:
       - "8000:8000"
     volumes:
@@ -34,7 +35,11 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    #command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: >
+      bash -c "
+        alembic upgrade head && python -m app.utils.seed_test_data &&
+        exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
 
 volumes:
   pgdata:

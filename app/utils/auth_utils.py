@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi import Header, HTTPException
 from dotenv import load_dotenv
 import os
 
