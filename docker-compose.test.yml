@@ -9,6 +9,8 @@ services:
       - "5433:5432"
     volumes:
       - db_test_data:/var/lib/postgresql/data
+    networks:
+      - test_network
     # healthcheck:
     #   test: ["CMD-SHELL", "pg_isready -U user"]
     #   interval: 10s
@@ -25,6 +27,10 @@ services:
   #     db:
   #       condition: service_healthy
   #   command: bash -c "pip install -r requirements-dev.txt && "
+
+networks:
+  test_network:
+    driver: bridge
 
 volumes:
   db_test_data:

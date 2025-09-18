@@ -15,13 +15,18 @@ from app.articles.schema import (
     PaginatedArticles, 
     ArticleUpdate
 )
+from app.utils.auth_utils import get_api_key
 
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
 
 
 @router.post("/", response_model=ArticleResponse, status_code=status.HTTP_201_CREATED)
-async def create_article_view(article: ArticleCreate, db: Session = Depends(get_db)):
+async def create_article_view(
+    article: ArticleCreate, 
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     return await create_article(db, article)
 
 
@@ -33,7 +38,8 @@ def get_articles_view(
     title: Optional[str] = None,
     author: Optional[str] = None,
     tags: Optional[List[str]] = Query(None),
-    content: Optional[str] = None
+    content: Optional[str] = None,
+    api_key: str = Depends(get_api_key)
 ):
     return get_articles(
         db, 
@@ -47,16 +53,29 @@ def get_articles_view(
 
 
 @router.get("/{article_id}", response_model=ArticleResponse)
-async def get_article_view(article_id: int, db: Session = Depends(get_db)):
+async def get_article_view(
+    article_id: int, 
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     return await get_article(db, article_id)
 
 
 @router.put("/{article_id}", response_model=ArticleResponse)
-async def update_article_view(article_id: int, article: ArticleUpdate, db: Session = Depends(get_db)):
+async def update_article_view(
+    article_id: int, 
+    article: ArticleUpdate, 
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     return await update_article(db, article_id, article)
 
 
 @router.delete("/{article_id}", status_code=204)
-async def delete_article_view(article_id: int, db: Session = Depends(get_db)):
+async def delete_article_view(
+    article_id: int, 
+    db: Session = Depends(get_db),
+    api_key: str = Depends(get_api_key)
+):
     await delete_article(db, article_id)
     return {"detail": "Article deleted successfully."}
