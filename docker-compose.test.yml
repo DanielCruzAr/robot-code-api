@@ -11,22 +11,6 @@ services:
       - db_test_data:/var/lib/postgresql/data
     networks:
       - test_network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "pg_isready -U user"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-
-  # test_api:
-  #   image: robot-code-api-web
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - .:/app
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   command: bash -c "pip install -r requirements-dev.txt && "
 
 networks:
   test_network:

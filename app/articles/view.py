@@ -5,7 +5,8 @@ from app.config.database import get_db
 from app.articles.controller import (
     create_article, 
     get_articles, 
-    get_article, 
+    get_article,
+    search_articles, 
     update_article, 
     delete_article
 )
@@ -90,3 +91,21 @@ async def delete_article_view(
 ):
     await delete_article(db, article_id)
     return {"detail": "Article deleted successfully."}
+
+
+@router.get("/search/", response_model=PaginatedArticles)
+@limiter.limit("50/minute")
+async def search_articles_view(
+    request: Request,
+    q: str,
+    db: Session = Depends(get_db),
+    page: int = 1,
+    page_size: int = 10,
+    api_key: str = Depends(get_api_key)
+):
+    return search_articles(
+        db,
+        q,
+        page=page,
+        page_size=page_size
+    )

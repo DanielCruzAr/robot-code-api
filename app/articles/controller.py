@@ -143,3 +143,34 @@ async def delete_article(db: Session, article_id: int) -> None:
     # Invalidate cache for the deleted article
     await cache_service.delete_cache("article", article_id)
     logging.info(f"Article deleted with ID: {article_id}")
+
+
+def search_articles(
+        db: Session,
+        q: str,
+        page: int,
+        page_size: int
+    ) -> PaginatedArticles:
+    query = db.query(Article).filter(
+        (Article.title.ilike(f"%{q}%")) |
+        (Article.body.ilike(f"%{q}%"))
+    )
+
+    offset = (page - 1) * page_size
+
+    articles = (
+        query
+        .order_by(Article.published_at.desc())
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    total_articles = query.count()
+
+    return PaginatedArticles(
+        total=total_articles,
+        page=page,
+        page_size=page_size,
+        articles=[ArticleResponse.from_orm(article) for article in articles]
+    )
