@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status, Query
+from fastapi import HTTPException, status
 from app.models.article import Article
 from app.articles.schema import (
     ArticleCreate, 
@@ -45,7 +45,7 @@ def get_articles(
         page_size: int,
         title: Optional[str] = None,
         author: Optional[str] = None,
-        tags: Optional[List[str]] = Query(None),
+        tags: Optional[List[str]] = None,
         content: Optional[str] = None
     ) -> PaginatedArticles:
     query = db.query(Article)
@@ -54,7 +54,7 @@ def get_articles(
         query = query.filter(Article.title.ilike(f"%{title}%"))
     if author:
         query = query.filter(Article.author.ilike(f"%{author}%"))
-    if tags:
+    if tags and isinstance(tags, list):
         query = query.filter(Article.tags.overlap(tags))
     if content:
         query = query.filter(Article.body.ilike(f"%{content}%"))

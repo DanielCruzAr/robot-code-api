@@ -1,4 +1,11 @@
 from tests.conftest import client
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+API_KEY_NAME = os.getenv("API_KEY_NAME")
 
 
 def test_post_article(client):
@@ -8,7 +15,7 @@ def test_post_article(client):
         "body": "This is a test article.",
         "tags": ["test", "sample"]
     }
-    response = client.post("/articles/", json=payload)
+    response = client.post("/articles/", json=payload, headers={API_KEY_NAME: API_KEY})
     assert response.status_code == 201
     data = response.json()
     assert data["title"] == payload["title"]
@@ -18,7 +25,7 @@ def test_post_article(client):
 
 
 def test_get_articles(client):
-    response = client.get("/articles/?page=1&page_size=10")
+    response = client.get("/articles/?page=1&page_size=10", headers={API_KEY_NAME: API_KEY})
     assert response.status_code == 200
     data = response.json()
     assert "articles" in data
@@ -34,11 +41,11 @@ def test_get_article(client):
         "body": "Single article body.",
         "tags": ["single"]
     }
-    post_resp = client.post("/articles/", json=payload)
+    post_resp = client.post("/articles/", json=payload, headers={API_KEY_NAME: API_KEY})
     article_id = post_resp.json()["id"]
 
     # Get article
-    response = client.get(f"/articles/{article_id}")
+    response = client.get(f"/articles/{article_id}", headers={API_KEY_NAME: API_KEY})
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == article_id
@@ -53,7 +60,7 @@ def test_update_article(client):
         "body": "Old body.",
         "tags": ["old"]
     }
-    post_resp = client.post("/articles/", json=payload)
+    post_resp = client.post("/articles/", json=payload, headers={API_KEY_NAME: API_KEY})
     article_id = post_resp.json()["id"]
 
     # Update article
@@ -61,7 +68,7 @@ def test_update_article(client):
         "body": "Updated body.",
         "tags": ["updated"]
     }
-    response = client.put(f"/articles/{article_id}", json=update_payload)
+    response = client.put(f"/articles/{article_id}", json=update_payload, headers={API_KEY_NAME: API_KEY})
     assert response.status_code == 200
     data = response.json()
     assert data["body"] == update_payload["body"]
@@ -76,14 +83,14 @@ def test_delete_article(client):
         "body": "To be deleted.",
         "tags": ["delete"]
     }
-    post_resp = client.post("/articles/", json=payload)
+    post_resp = client.post("/articles/", json=payload, headers={API_KEY_NAME: API_KEY})
     article_id = post_resp.json()["id"]
 
     # Delete article
-    response = client.delete(f"/articles/{article_id}")
+    response = client.delete(f"/articles/{article_id}", headers={API_KEY_NAME: API_KEY})
     assert response.status_code == 204
 
     # Try to get deleted article
-    get_resp = client.get(f"/articles/{article_id}")
+    get_resp = client.get(f"/articles/{article_id}", headers={API_KEY_NAME: API_KEY})
     assert get_resp.status_code == 404
     
