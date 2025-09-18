@@ -9,7 +9,12 @@ from app.articles.controller import (
     update_article, 
     delete_article
 )
-from app.articles.schema import ArticleCreate, ArticleResponse, PaginatedArticles
+from app.articles.schema import (
+    ArticleCreate, 
+    ArticleResponse, 
+    PaginatedArticles, 
+    ArticleUpdate
+)
 
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
@@ -47,7 +52,7 @@ async def get_article_view(article_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{article_id}", response_model=ArticleResponse)
-async def update_article_view(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):
+async def update_article_view(article_id: int, article: ArticleUpdate, db: Session = Depends(get_db)):
     return await update_article(db, article_id, article)
 
 

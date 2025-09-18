@@ -100,7 +100,6 @@ async def get_article(db: Session, article_id: int) -> ArticleResponse:
     return article_schema
 
 
-# TODO: Check that article title + author combination is unique on update
 async def update_article(db: Session, article_id: int, article_data: ArticleUpdate) -> ArticleResponse:
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
@@ -109,9 +108,17 @@ async def update_article(db: Session, article_id: int, article_data: ArticleUpda
             detail=f"Article '{article_id}' not found.",
         )
     
-    for key, value in article_data.model_dump().items():
+    update_data = article_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
         setattr(article, key, value)
-    
+
+    existing_author_article = db.query(Article).filter(Article.author==article.author, Article.title==article.title).first()
+    if existing_author_article and existing_author_article.id != article.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Article with title '{article.title}' by author '{article.author}' already exists.",
+        )
+
     db.commit()
     db.refresh(article)
 
