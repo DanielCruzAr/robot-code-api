@@ -23,6 +23,8 @@ Prueba técnica de RocketCode
 	```
     **Nota:** No es necesario hacer docker build porque subí la imagen a un repositorio público en dockerhub pero para hacerlo solo hay que descomentar la línea 26 y comentar la 25 en el archivo de `docker-compose.yml`.
 
+Una vez completados los pasos entra a http://localhost:8000/docs# para visualizar los endpoints disponibles.
+
 ## Para ejecutar las pruebas unitarias y de integración
 
 1. Crea un nuevo entorno de Python e instala las dependencias:
