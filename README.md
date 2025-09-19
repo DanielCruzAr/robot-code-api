@@ -23,7 +23,7 @@ Prueba técnica de RocketCode
 	```
     **Nota:** No es necesario hacer docker build porque subí la imagen a un repositorio público en dockerhub pero para hacerlo solo hay que descomentar la línea 26 y comentar la 25 en el archivo de `docker-compose.yml`. Las migraciones corren automáticamente al levantar el servicio y se generan datos de prueba.
 
-Una vez completados los pasos entra a http://localhost:8000/docs# para visualizar los endpoints disponibles.
+Una vez completados los pasos entra a http://localhost:8000/docs# para visualizar los endpoints disponibles. Todos los endpoints necesitan el header `x-api-key=supersecretapikey123`
 
 ## Para ejecutar las pruebas unitarias y de integración
 
