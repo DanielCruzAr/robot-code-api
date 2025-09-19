@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.articles import view
+from app import health
 from .logging import configure_logging, LogLevels
 import logging
 
@@ -9,6 +10,7 @@ configure_logging(LogLevels.info)
 app = FastAPI(title="Article Management API", version="1.0.0")
 
 app.include_router(view.router)
+app.include_router(health.router)
 
 @app.on_event("startup")
 async def startup_event():
